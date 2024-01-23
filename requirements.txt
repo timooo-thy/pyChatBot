@@ -1,2 +1,2 @@
 streamlit==1.30.0
-hugchat-api==0.0.2.5
+hugchat==0.3.10
