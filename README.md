@@ -93,9 +93,9 @@ It also includes advanced prompting, to restrict user from answering questions o
    <lab>: We focus on product development, training services, and platform development, with a focus on delivering quality and results for trainers.
    ```
 
-   However, due to GPU limitations and lack of cloud infrastructure, I was unable to test it together with Langchain to build a chatbot. Hence, I decided to go with advanced prompting.
+   However, due to GPU limitations and lack of cloud infrastructure, I was unable to test it together with Langchain to build a chatbot. Hence, I decided to go with prompt engineering by Chain of Thought.
 
-2. Using advanced prompting
+2. Using Chain of Thought
    By giving context about the conversation and a set of instructions, we can restrict the chatbot to act as an assistant for a company or product. This acheived similar results compared to finetuning a model.
 
    Input Prompt Example 1:
