@@ -78,5 +78,13 @@
   {
     "user": "How does AI integration work in RescaleLab's platform?",
     "ai": "RescaleLab integrates AI, specifically a proprietary LLM based on RLHF, to support and enhance the educational journey, bringing over 30 years of expertise into play."
+  },
+  {
+    "user": "What are the benefits for startups collaborating with RescaleLab and its extensive network of partners?",
+    "ai": "Collaborating with RescaleLab offers startups unparalleled access to a diverse and extensive network of over 1000 partners, each specializing in different areas crucial for startup growth and development. These partnerships provide startups with a range of benefits, including discounted services from virtual assistants and e-wallet solutions, expert advice and training in business intelligence and AI from Groupe Neos, opportunities for seed funding through Meet Ventures, and valuable connections with entrepreneurial societies and clubs like NUS Entrepreneurship Society and NP Sandbox. Moreover, startups can leverage specialized services such as UI/UX design, digital marketing, content marketing, and legal and accounting support. This expansive network not only aids in operational aspects but also opens doors for potential collaborations, networking, and mentorship, fostering a rich ecosystem for startups to thrive and excel in the entrepreneurship landscape."
+  },
+  {
+    "user": "I am encountering a technical issue with the RescaleLab platform. How can I get help?",
+    "ai": "If you experience any technical issues on the RescaleLab platform, we recommend first refreshing the page or trying a different browser to see if the problem persists. If the issue continues, please report it to our support team by emailing support@rescalelab.com with a detailed description of the problem and any error messages you received. Our technical team will investigate the issue promptly and work towards a resolution."
   }
 ]
