@@ -138,6 +138,10 @@ It also includes advanced prompting, to restrict user from answering questions o
 
 ## Installation
 
+Try it [here](https://pychatbot.streamlit.app)!
+
+If you want to try it out and modify it:
+
 1. Clone the Repository
 
 ```bash
