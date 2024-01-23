@@ -25,7 +25,26 @@ It also includes advanced prompting, to restrict user from answering questions o
 1. ConversationBufferMemory
 2. ConversationSummaryMemory
 3. ConversationBufferWindowMemory
+
+   Pros:
+   - Storing everything gives the LLM the maximum amount of information.
+   - Buffer prevents us from storing everything in the whole conversation to prevent token limit is simple and intuitive.
+   
+   Cons:
+   - More tokens mean slowing response times and higher costs.
+   - Long conversations cannot be remembered as we hit the LLM token limit.
 4. ConversationSummaryBufferMemory
+
+   Pros:
+   - Summariser means we can remember distant interactions.
+   - Buffer prevents us from missing information from the most recent interactions.
+   
+   Cons:
+   - Summariser increases token count for shorter conversations.
+   - Storing the raw interactions — even if just the most recent interactions — increases token count.
+  
+Hence, I proceeded with ConversationSummaryBufferMemory.
+     
 ### Types of model used
 1. [PEFT Model](https://huggingface.co/matrixavenger/rescalelab) and [Base Model](https://huggingface.co/tiiuae/falcon-7b-instruct)
    
@@ -104,13 +123,20 @@ streamlit run rescalelabChat.py
 ```
 
 ## Usage
-Login: Enter your Huggingface credentials at the sidebar.
-Start Chatting: Simply type your query or message in the input field and press Enter.
-Manage Sessions: Start new sessions or review past conversations for reference.
-Download Conversations: Download the transcript of your current or past conversations for record-keeping.
+**Login**: Enter your Huggingface credentials at the sidebar.
+
+**Start Chatting**: Simply type your query or message in the input field and press Enter.
+
+**Manage Sessions**: Start new sessions or review past conversations for reference.
+
+**Download Conversations**: Download the transcript of your current or past conversations for record-keeping.
+
 
 ## Acknowledgements
-Huggingface for the LLM model (meta-llama/Llama-2-70b-chat-hf)
-LangChain library for conversational AI functionalities.
-Transformers and PEFT to train model
-Streamlit for providing an intuitive app-building framework.
+- Huggingface for the LLM model (meta-llama/Llama-2-70b-chat-hf & tiiuae/falcon-7b-instruct)
+
+- LangChain library for conversational AI functionalities.
+
+- Transformers and PEFT to train model
+
+- Streamlit for providing an intuitive app-building framework.
