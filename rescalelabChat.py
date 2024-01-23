@@ -1,8 +1,9 @@
 import streamlit as st
 from hugchat import hugchat
 from hugchat.login import Login
-import json
+# import json
 
+# Function for signing in to Hugging Face
 def sign_in(email, password):
     # Hugging Face Login
     sign = Login(email, password)
@@ -41,6 +42,7 @@ for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.write(message["content"])
 
+# Function for adding custom CSS
 def add_custom_css():
     st.markdown("""
     <style>
@@ -51,7 +53,7 @@ def add_custom_css():
     """, unsafe_allow_html=True)
 
 # Function for generating LLM response
-def generate_response(data, conversation, prompt_input, cookies):     
+def generate_response(conversation, prompt_input, cookies, data=None):     
     add_custom_css()               
     chatbot = hugchat.ChatBot(cookies=cookies.get_dict())
     chatbot.switch_llm(1)
@@ -60,6 +62,8 @@ def generate_response(data, conversation, prompt_input, cookies):
 
     # Initialize an empty string to collect responses
     collected_responses = ''
+
+    # Create a prompt chaining the conversation and the new message from the user
     prompt = (f"This is a fun conversation between an AI and a human. Your role is to engage users with informative, very entertaining responses about Rescale Lab."
               "Focus on providing accurate and relevant information about the company's services and initiatives."
               "If a query falls outside Rescale Lab's scope, politely steer the conversation back to topics directly related to Rescale Lab."
@@ -67,6 +71,7 @@ def generate_response(data, conversation, prompt_input, cookies):
               "Keep responses short and concise, and avoid using technical jargon." 
               f"Knowledge base={data} The last 10 conversation is {conversation[:10]}." + f"The new message from human: {prompt_input}. AI:")
     
+    # Enable streaming responses from the chatbot
     for resp in chatbot.query(prompt, stream=True):
         # Append the token to the collected_responses string
         if type(resp) == dict:
@@ -87,6 +92,7 @@ def generate_response(data, conversation, prompt_input, cookies):
     #     outputs = model.generate(input_ids=inputs.to(device), max_new_tokens=10)
     #     return tokenizer.decode(outputs[0], skip_special_tokens=True)
 
+# Function for getting cookies
 def get_cookies(sign):
     try:
         cookie_path_dir = "./cookies_snapshot"
@@ -102,9 +108,9 @@ is_input_enabled = hf_email and hf_pass
 # Get user input from chat
 prompt = st.chat_input(disabled=not is_input_enabled)
 
-with open("training_data.json", "r") as a:
-    data = json.load(a)
-
+# Load training data
+# with open("training_data.json", "r") as a:
+#     data = json.load(a)
 
 if prompt:
     st.session_state.messages.append({"role": "user", "content": prompt})
@@ -116,6 +122,6 @@ if st.session_state.messages[-1]["role"] != "AI":
     with st.chat_message("AI"):
         cookies = get_cookies(credentials)
         with st.spinner("Generating response..."):
-            response = generate_response(data, st.session_state.messages, prompt, cookies) 
+            response = generate_response(st.session_state.messages, prompt, cookies) 
     message = {"role": "AI", "content": response}
     st.session_state.messages.append(message)
