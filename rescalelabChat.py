@@ -99,6 +99,9 @@ def get_cookies(sign):
 def save_conversations(conversations):
     """Function for saving conversations to JSON file"""
 
+    if not os.path.exists('conversations'):
+        os.makedirs('conversations')
+
     conversations_file = 'conversations/conversations_history.json'
 
     with open(conversations_file, 'w') as f:
@@ -128,34 +131,41 @@ def main():
     if "messages" not in st.session_state.keys():
         st.session_state.messages = load_conversations()
 
+    # Initialise session state for storing current conversation
     if 'current_conversation' not in st.session_state:
         st.session_state.current_conversation = next(
             iter(st.session_state.messages))
 
+    # Initialise session state for storing conversation count
     if 'conversation_count' not in st.session_state:
-        st.session_state.conversation_count = len(st.session_state.messages)
+        st.session_state.conversation_count = len(
+            st.session_state.messages)
+
+    # Initialise session state for email
+    if "email" not in st.session_state.keys():
+        st.session_state.email = None
+
+    # Initialise session state for password
+    if "password" not in st.session_state.keys():
+        st.session_state.password = None
 
     # Sidebar for Hugging Face credentials, chat history download and buffer memory adjustment
     with st.sidebar:
         st.title('Rescale Lab AI Chatbot')
 
-        if ('EMAIL' in st.secrets) and ('PASS' in st.secrets):
-            st.success(
-                'HuggingFace Login credentials already provided!', icon='✅')
-            hf_email = st.secrets['EMAIL']
-            hf_pass = st.secrets['PASS']
+        st.session_state.email = st.text_input('Enter E-mail:', type='default')
+        st.session_state.password = st.text_input(
+            'Enter password:', type='password')
+        if not (st.session_state.email and st.session_state.password):
+            st.warning('Please enter your credentials!', icon='⚠️')
         else:
-            hf_email = st.text_input('Enter E-mail:', type='default')
-            hf_pass = st.text_input('Enter password:', type='password')
-            if not (hf_email and hf_pass):
-                st.warning('Please enter your credentials!', icon='⚠️')
-            else:
-                st.success(
-                    'Proceed to entering your prompt message!', icon='👉')
-                credentials = sign_in(hf_email, hf_pass)
+            st.success(
+                'Proceed to entering your prompt message!', icon='👉')
+            credentials = sign_in(st.session_state.email,
+                                  st.session_state.password)
 
         # Determine if the chat input should be enabled based on the availability of credentials
-        is_input_enabled = hf_email and hf_pass
+        is_input_enabled = st.session_state.email and st.session_state.password
 
         # Sidebar for creating a new conversation
         if st.sidebar.button("Create a new conversation", disabled=not is_input_enabled):
@@ -230,8 +240,9 @@ def main():
         st.session_state.messages[st.session_state.current_conversation].append(
             message)
 
-    # Save conversations to JSON file
-    save_conversations(st.session_state.messages)
+    if len(st.session_state.messages[st.session_state.current_conversation]) > 1:
+        save_conversations(st.session_state.messages,
+                           )
 
 
 if __name__ == "__main__":
