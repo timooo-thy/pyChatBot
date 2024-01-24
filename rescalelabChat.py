@@ -153,8 +153,9 @@ def main():
             disabled=not is_input_enabled
         )
 
-    # Generate embeddings from the knowledge base
-    db = generate_embeddings()
+    # Retrieve embeddings from the knowledge base
+    embeddings = OpenAIEmbeddings()
+    db = FAISS.load_local("faiss_index", embeddings)
 
     # Chat input for user prompts
     prompt = st.chat_input(disabled=not is_input_enabled)
