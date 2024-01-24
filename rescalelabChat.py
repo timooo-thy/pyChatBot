@@ -29,7 +29,6 @@ def generate_embeddings():
 def retrieve_context(db, prompt_input):
     similar_response = db.similarity_search(prompt_input, k=3)
     content_arr = [doc.page_content for doc in similar_response]
-    print(content_arr)
     return content_arr
 
 
