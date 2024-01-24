@@ -181,6 +181,10 @@ streamlit run rescalelabChat.py
 
 - Huggingface for the LLM model (meta-llama/Llama-2-70b-chat-hf & tiiuae/falcon-7b-instruct)
 
-- Transformers and PEFT to train model
+- Transformers and PEFT to train model.
 
 - Streamlit for providing an intuitive app-building framework.
+
+- Langchain for retrieval augmented generation.
+
+- OpenAI for text embeddings.
