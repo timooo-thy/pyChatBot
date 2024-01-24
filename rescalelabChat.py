@@ -7,9 +7,6 @@ from langchain_community.vectorstores import FAISS
 from langchain_openai import OpenAIEmbeddings
 from dotenv import load_dotenv
 
-# Load environment variables
-load_dotenv()
-
 # Function for generating embeddings from the knowledge base
 
 
@@ -102,6 +99,9 @@ def get_cookies(sign):
 
 
 def main():
+
+    # Load environment variables
+    load_dotenv()
 
     # App title
     st.set_page_config(
