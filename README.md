@@ -95,7 +95,12 @@ It also includes advanced prompting, to restrict user from answering questions o
 
    However, due to GPU limitations and lack of cloud infrastructure, I was unable to test it together with Langchain to build a chatbot. Hence, I decided to go with prompt engineering by Chain of Thought.
 
-2. Using Chain of Thought
+2. Using Chain of Thought and Retrieval Augmented Generation
+
+   I created embeddings of private data with OPENAI embeddings and store them in vector database in order to carry out RAG.
+
+   Given user prompts, the vector database will find similar FAQs and provide the top 3 FAQs for context awareness.
+
    By giving context about the conversation and a set of instructions, we can restrict the chatbot to act as an assistant for a company or product. This acheived similar results compared to finetuning a model.
 
    Input Prompt Example 1:

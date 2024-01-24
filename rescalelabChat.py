@@ -10,25 +10,28 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
-# Load training data from CSV file
-loader = CSVLoader("training_data.csv")
-documents = loader.load()
+# Function for generating embeddings from the knowledge base
 
-# Create a FAISS vector store from the documents
-embeddings = OpenAIEmbeddings()
-db = FAISS.from_documents(documents, embeddings)
+
+def generate_embeddings():
+    # Load training data from CSV file
+    loader = CSVLoader("training_data.csv")
+    documents = loader.load()
+
+    # Create a FAISS vector store from the documents
+    embeddings = OpenAIEmbeddings()
+    db = FAISS.from_documents(documents, embeddings)
+    return db
 
 # Function for retrieving context from the knowledge base
 
 
-def retrieve_context(prompt_input):
+def retrieve_context(db, prompt_input):
     similar_response = db.similarity_search(prompt_input, k=3)
     content_arr = [doc.page_content for doc in similar_response]
     print(content_arr)
     return content_arr
 
-
-retrieve_context("What is Rescale Lab?")
 
 # Function for signing in to Hugging Face
 
@@ -151,6 +154,9 @@ def main():
             disabled=not is_input_enabled
         )
 
+    # Generate embeddings from the knowledge base
+    db = generate_embeddings()
+
     # Chat input for user prompts
     prompt = st.chat_input(disabled=not is_input_enabled)
 
@@ -164,7 +170,7 @@ def main():
         with st.chat_message("AI"):
             cookies = get_cookies(credentials)
             with st.spinner("Generating response..."):
-                similar_context = retrieve_context(prompt)
+                similar_context = retrieve_context(db, prompt)
                 response = generate_response(
                     st.session_state.messages, prompt, cookies, value, similar_context)
         message = {"role": "AI", "content": response}
