@@ -188,3 +188,5 @@ streamlit run rescalelabChat.py
 - Langchain for retrieval augmented generation.
 
 - OpenAI for text embeddings.
+
+- FAISS for vector store and similarity search.
