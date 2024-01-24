@@ -12,7 +12,7 @@ import os
 def generate_embeddings():
     """Function for generating embeddings from the knowledge base"""
     # Load training data from CSV file
-    loader = CSVLoader("training_data.csv")
+    loader = CSVLoader("data/training_data.csv")
     documents = loader.load()
 
     # Create a FAISS vector store from the documents
@@ -26,9 +26,6 @@ def retrieve_context(db, prompt_input):
     similar_response = db.similarity_search(prompt_input, k=3)
     content_arr = [doc.page_content for doc in similar_response]
     return content_arr
-
-
-#
 
 
 def sign_in(email, password):
@@ -98,7 +95,7 @@ def get_cookies(sign):
 def save_conversations(conversations):
     """Function for saving conversations to JSON file"""
 
-    conversations_file = 'conversations_history.json'
+    conversations_file = 'conversations/conversations_history.json'
 
     with open(conversations_file, 'w') as f:
         json.dump(conversations, f, indent=4)
@@ -106,7 +103,7 @@ def save_conversations(conversations):
 
 def load_conversations():
     """Function for loading conversations from JSON file"""
-    conversations_file = 'conversations_history.json'
+    conversations_file = 'conversations/conversations_history.json'
     if os.path.exists(conversations_file):
         with open(conversations_file, 'r') as f:
             return json.load(f)
