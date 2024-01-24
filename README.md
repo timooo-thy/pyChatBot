@@ -18,6 +18,8 @@ It also includes advanced prompting, to restrict user from answering questions o
 
 - **Customisable Settings**: Users can adjust model parameters and settings directly through the sidebar, tailoring the experience to their preferences.
 
+- **Conversation Management**: Allows users to create, delete, and switch between different conversation threads. This feature will enable users to separate topics and maintain organised discussions. Each conversation thread could be named or tagged for easy identification.
+
 - **Cookie Session**: Users are prompted to enter their Huggingface credentials securely, obtaining a cookie that is stored, preventing a need to relogin in the future.
 
 ## Thought Process
@@ -93,15 +95,16 @@ It also includes advanced prompting, to restrict user from answering questions o
    <lab>: We focus on product development, training services, and platform development, with a focus on delivering quality and results for trainers.
    ```
 
-   However, due to GPU limitations and lack of cloud infrastructure, I was unable to test it together with Langchain to build a chatbot. Hence, I decided to go with prompt engineering by Chain of Thought.
+   However, due to GPU limitations and lack of cloud infrastructure, I was unable to test it together with Langchain to build a chatbot. Hence, I decided to go with prompt engineering.
+   As I wanted to use an open source model, I was unable to create sequential chains & text summariser in Langchain.
 
-2. Using Chain of Thought and Retrieval Augmented Generation
+3. Using Chain of Thought and Retrieval Augmented Generation
 
-   I created embeddings of private data with OPENAI embeddings and store them in vector database in order to carry out RAG.
+   - Utilised OpenAI embeddings to create detailed vector representations of private data, specifically FAQs related to your company or product, and store them in a scalable and efficient vector database for quick retrieval.
 
-   Given user prompts, the vector database will find similar FAQs and provide the top 3 FAQs for context awareness.
+   - Used an advanced algorithm for the vector database to identify the top 3 most relevant FAQs in response to user prompts, focusing on both direct matches and semantically related queries to improve the chatbot's understanding and response accuracy.
 
-   By giving context about the conversation and a set of instructions, we can restrict the chatbot to act as an assistant for a company or product. This acheived similar results compared to finetuning a model.
+   - Integrated the retrieved FAQs into the chatbot's conversation flow, ensuring that the responses are not only relevant but also contextually aligned with the ongoing discussion, thus enhancing the chatbot's role as an assistant specific to your company or product.
 
    Input Prompt Example 1:
 
@@ -190,3 +193,6 @@ streamlit run rescalelabChat.py
 - OpenAI for text embeddings.
 
 - FAISS for vector store and similarity search.
+
+## License
+[MIT](https://opensource.org/license/mit/)
