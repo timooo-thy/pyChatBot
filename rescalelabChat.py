@@ -8,10 +8,9 @@ from langchain_openai import OpenAIEmbeddings
 from dotenv import load_dotenv
 import os
 
-# Function for generating embeddings from the knowledge base
-
 
 def generate_embeddings():
+    """Function for generating embeddings from the knowledge base"""
     # Load training data from CSV file
     loader = CSVLoader("training_data.csv")
     documents = loader.load()
@@ -21,20 +20,19 @@ def generate_embeddings():
     db = FAISS.from_documents(documents, embeddings)
     return db
 
-# Function for retrieving context from the knowledge base
-
 
 def retrieve_context(db, prompt_input):
+    """Function for retrieving context from the knowledge base"""
     similar_response = db.similarity_search(prompt_input, k=3)
     content_arr = [doc.page_content for doc in similar_response]
     return content_arr
 
 
-# Function for signing in to Hugging Face
+#
 
 
 def sign_in(email, password):
-    # Hugging Face Login
+    """Function for signing in to Hugging Face"""
     sign = Login(email, password)
     # Path to save cookies
     cookie_path_dir = "./cookies_snapshot"
@@ -42,10 +40,9 @@ def sign_in(email, password):
     sign.saveCookiesToDir(cookie_path_dir)
     return Login(email, password)
 
-# Function for adding custom CSS
-
 
 def add_custom_css():
+    """Function for adding custom CSS"""
     st.markdown("""
     <style>
     .wrapper {
@@ -53,11 +50,11 @@ def add_custom_css():
     }
     </style>
     """, unsafe_allow_html=True)
-
-# Function for generating LLM response
+#
 
 
 def generate_response(conversation, prompt_input, cookies, value, context=None,):
+    """Function for generating LLM response"""
     add_custom_css()
     chatbot = hugchat.ChatBot(cookies=cookies.get_dict())
     chatbot.switch_llm(1)
@@ -86,10 +83,9 @@ def generate_response(conversation, prompt_input, cookies, value, context=None,)
 
     return collected_responses
 
-# Function for getting cookies
-
 
 def get_cookies(sign):
+    """Function for getting cookies from the local directory"""
     try:
         cookie_path_dir = "./cookies_snapshot"
         cookies = sign.loadCookiesFromDir(cookie_path_dir)
@@ -98,28 +94,24 @@ def get_cookies(sign):
 
     return cookies
 
-# Function for saving conversations to JSON file
-
 
 def save_conversations(conversations):
+    """Function for saving conversations to JSON file"""
+
     conversations_file = 'conversations_history.json'
 
     with open(conversations_file, 'w') as f:
         json.dump(conversations, f, indent=4)
 
-# Function for loading conversations from JSON file
-
 
 def load_conversations():
+    """Function for loading conversations from JSON file"""
     conversations_file = 'conversations_history.json'
     if os.path.exists(conversations_file):
         with open(conversations_file, 'r') as f:
             return json.load(f)
     return {"Conversation 1": [
             {"role": "AI", "content": "Hello, I am Joe from RescaleLab. How may I help you today?"}]}
-
-
-# Main function
 
 
 def main():
