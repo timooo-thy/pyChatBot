@@ -141,7 +141,7 @@ def main():
 
         # Buffer memory adjustment slider
         st.title("Adjust the Buffer Memory")
-        value = st.slider("Select a value", min_value=0, max_value=20, value=0)
+        value = st.slider("Select a value", min_value=5, max_value=20, value=0)
 
         # Download chat history button
         chat_history_json = json.dumps(st.session_state.messages, indent=4)
