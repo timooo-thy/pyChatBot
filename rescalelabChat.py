@@ -6,6 +6,7 @@ from langchain.document_loaders.csv_loader import CSVLoader
 from langchain_community.vectorstores import FAISS
 from langchain_openai import OpenAIEmbeddings
 from dotenv import load_dotenv
+import os
 
 # Function for generating embeddings from the knowledge base
 
@@ -97,6 +98,29 @@ def get_cookies(sign):
 
     return cookies
 
+# Function for saving conversations to JSON file
+
+
+def save_conversations(conversations):
+    conversations_file = 'conversations_history.json'
+
+    with open(conversations_file, 'w') as f:
+        json.dump(conversations, f, indent=4)
+
+# Function for loading conversations from JSON file
+
+
+def load_conversations():
+    conversations_file = 'conversations_history.json'
+    if os.path.exists(conversations_file):
+        with open(conversations_file, 'r') as f:
+            return json.load(f)
+    return {"Conversation 1": [
+            {"role": "AI", "content": "Hello, I am Joe from RescaleLab. How may I help you today?"}]}
+
+
+# Main function
+
 
 def main():
 
@@ -109,13 +133,14 @@ def main():
 
     # Initialise session state for storing messages
     if "messages" not in st.session_state.keys():
-        st.session_state.messages = [
-            {"role": "AI", "content": "Hello, I am Joe from RescaleLab. How may I help you today?"}]
+        st.session_state.messages = load_conversations()
 
-    # Display existing chat messages
-    for message in st.session_state.messages:
-        with st.chat_message(message["role"]):
-            st.write(message["content"])
+    if 'current_conversation' not in st.session_state:
+        st.session_state.current_conversation = next(
+            iter(st.session_state.messages))
+
+    if 'conversation_count' not in st.session_state:
+        st.session_state.conversation_count = len(st.session_state.messages)
 
     # Sidebar for Hugging Face credentials, chat history download and buffer memory adjustment
     with st.sidebar:
@@ -139,19 +164,53 @@ def main():
         # Determine if the chat input should be enabled based on the availability of credentials
         is_input_enabled = hf_email and hf_pass
 
+        # Sidebar for creating a new conversation
+        if st.sidebar.button("Create a new conversation", disabled=not is_input_enabled):
+            st.session_state.messages[f"Conversation {st.session_state.conversation_count + 1}"] = [
+                {"role": "AI", "content": "Hello, I am Joe from RescaleLab. How may I help you today?"}]
+            st.session_state.conversation_count += 1
+            st.session_state.current_conversation = f"Conversation {st.session_state.conversation_count}"
+
+        # Download chat history button
+        chat_history_json = json.dumps(st.session_state.messages, indent=4)
+        if st.download_button(
+            label="Download current chat history",
+            data=chat_history_json,
+            file_name=f"{st.session_state.current_conversation}_history.json",
+            mime="application/json",
+            disabled=not is_input_enabled
+        ):
+            st.toast("Chat history downloaded!", icon="📥")
+
+        if st.button("Delete chat history", disabled=not is_input_enabled):
+            st.toast("Chat history deleted!", icon="🗑️")
+
+            # Delete current conversation
+            del st.session_state.messages[st.session_state.current_conversation]
+
+            if len(st.session_state.messages) == 0:
+                st.session_state.messages = {"Conversation 1": [
+                    {"role": "AI", "content": "Hello, I am Joe from RescaleLab. How may I help you today?"}]}
+                st.session_state.current_conversation = "Conversation 1"
+                st.session_state.conversation_count = 1
+
+            else:
+                # Update to another existing conversation
+                st.session_state.current_conversation = next(
+                    iter(st.session_state.messages))
+
+        # Sidebar for selecting conversation
+        st.session_state.current_conversation = st.sidebar.selectbox(
+            "Select a conversation", list(st.session_state.messages.keys()), index=list(st.session_state.messages.keys()).index(st.session_state.current_conversation))
+
         # Buffer memory adjustment slider
         st.title("Adjust the Buffer Memory")
         value = st.slider("Select a value", min_value=0, max_value=20, value=5)
 
-        # Download chat history button
-        chat_history_json = json.dumps(st.session_state.messages, indent=4)
-        st.download_button(
-            label="Download chat history",
-            data=chat_history_json,
-            file_name="chat_history.json",
-            mime="application/json",
-            disabled=not is_input_enabled
-        )
+    # Display existing chat messages
+    for message in st.session_state.messages[st.session_state.current_conversation]:
+        with st.chat_message(message["role"]):
+            st.write(message["content"])
 
     # Retrieve embeddings from the knowledge base
     embeddings = OpenAIEmbeddings()
@@ -161,20 +220,25 @@ def main():
     prompt = st.chat_input(disabled=not is_input_enabled)
 
     if prompt:
-        st.session_state.messages.append({"role": "user", "content": prompt})
+        st.session_state.messages[st.session_state.current_conversation].append(
+            {"role": "user", "content": prompt})
         with st.chat_message("user"):
             st.write(prompt)
 
     # Generate a new response if last message is not from AI
-    if st.session_state.messages[-1]["role"] != "AI":
+    if st.session_state.messages[st.session_state.current_conversation][-1]["role"] != "AI":
         with st.chat_message("AI"):
             cookies = get_cookies(credentials)
             with st.spinner("Generating response..."):
                 similar_context = retrieve_context(db, prompt)
                 response = generate_response(
-                    st.session_state.messages, prompt, cookies, value, similar_context)
+                    st.session_state.messages[st.session_state.current_conversation], prompt, cookies, value, similar_context)
         message = {"role": "AI", "content": response}
-        st.session_state.messages.append(message)
+        st.session_state.messages[st.session_state.current_conversation].append(
+            message)
+
+    # Save conversations to JSON file
+    save_conversations(st.session_state.messages)
 
 
 if __name__ == "__main__":
