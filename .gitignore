@@ -2,3 +2,4 @@
 venv
 cookies_snapshot/*
 !cookies_snapshot/.gitkeep
+.DS_Store

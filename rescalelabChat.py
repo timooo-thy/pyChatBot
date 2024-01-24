@@ -12,12 +12,16 @@ import os
 def generate_embeddings():
     """Function for generating embeddings from the knowledge base"""
     # Load training data from CSV file
-    loader = CSVLoader("data/training_data.csv")
+    loader = CSVLoader(
+        "data/training_data.csv")
     documents = loader.load()
 
     # Create a FAISS vector store from the documents
     embeddings = OpenAIEmbeddings()
     db = FAISS.from_documents(documents, embeddings)
+
+    # Save the vector store to the local directory
+    db.save_local("faiss_index")
     return db
 
 
