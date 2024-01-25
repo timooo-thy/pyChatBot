@@ -22,6 +22,8 @@ It also includes advanced prompting, to restrict user from answering questions o
 
 - **Cookie Session**: Users are prompted to enter their Huggingface credentials securely, obtaining a cookie that is stored, preventing a need to relogin in the future.
 
+- **Private Session**: Own your conversations from other users! Create, delete and download any conversations with ease.
+
 ## Thought Process
 
 ### Types of memory to consider:
