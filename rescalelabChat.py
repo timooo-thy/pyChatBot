@@ -96,26 +96,34 @@ def get_cookies(sign):
     return cookies
 
 
-def save_conversations(conversations):
+def save_conversations(conversations, email):
     """Function for saving conversations to JSON file"""
 
-    if not os.path.exists('conversations'):
-        os.makedirs('conversations')
+    if not os.path.exists(f'conversations/{email}'):
+        os.makedirs(f'conversations/{email}')
 
-    conversations_file = 'conversations/conversations_history.json'
+    conversations_file = f'conversations/{email}/conversations_history.json'
 
     with open(conversations_file, 'w') as f:
         json.dump(conversations, f, indent=4)
 
 
-def load_conversations():
+def load_conversations(email):
     """Function for loading conversations from JSON file"""
-    conversations_file = 'conversations/conversations_history.json'
+    conversations_file = f'conversations/{email}/conversations_history.json'
     if os.path.exists(conversations_file):
         with open(conversations_file, 'r') as f:
             return json.load(f)
     return {"Conversation 1": [
             {"role": "AI", "content": "Hello, I am Joe from RescaleLab. How may I help you today?"}]}
+
+
+def change_user():
+    st.session_state.messages = load_conversations(st.session_state.email)
+    st.session_state.current_conversation = next(
+        iter(st.session_state.messages))
+    st.session_state.conversation_count = len(
+        st.session_state.messages)
 
 
 def main():
@@ -127,45 +135,42 @@ def main():
     st.set_page_config(
         page_title="Rescale Lab AI Chatbot by Timothy", page_icon=":robot_face:")
 
-    # Initialise session state for storing messages
-    if "messages" not in st.session_state.keys():
-        st.session_state.messages = load_conversations()
-
-    # Initialise session state for storing current conversation
-    if 'current_conversation' not in st.session_state:
-        st.session_state.current_conversation = next(
-            iter(st.session_state.messages))
-
-    # Initialise session state for storing conversation count
-    if 'conversation_count' not in st.session_state:
-        st.session_state.conversation_count = len(
-            st.session_state.messages)
-
-    # Initialise session state for email
-    if "email" not in st.session_state.keys():
-        st.session_state.email = None
-
-    # Initialise session state for password
-    if "password" not in st.session_state.keys():
-        st.session_state.password = None
-
     # Sidebar for Hugging Face credentials, chat history download and buffer memory adjustment
     with st.sidebar:
         st.title('Rescale Lab AI Chatbot')
 
-        st.session_state.email = st.text_input('Enter E-mail:', type='default')
-        st.session_state.password = st.text_input(
+        email = st.text_input(
+            'Enter E-mail:', type='default', on_change=change_user)
+        password = st.text_input(
             'Enter password:', type='password')
-        if not (st.session_state.email and st.session_state.password):
+        if not (email and password):
             st.warning('Please enter your credentials!', icon='⚠️')
         else:
             st.success(
                 'Proceed to entering your prompt message!', icon='👉')
-            credentials = sign_in(st.session_state.email,
-                                  st.session_state.password)
+            credentials = sign_in(email,
+                                  password)
+
+        # Initialise session state for storing current conversation
+        if 'email' not in st.session_state:
+            st.session_state.email = ""
+
+        if "messages" not in st.session_state or st.session_state.email != email:
+            st.session_state.email = email
+            st.session_state.messages = load_conversations(email)
+
+        # Initialise session state for storing current conversation
+        if 'current_conversation' not in st.session_state:
+            st.session_state.current_conversation = next(
+                iter(st.session_state.messages))
+
+        # Initialise session state for storing conversation count
+        if 'conversation_count' not in st.session_state:
+            st.session_state.conversation_count = len(
+                st.session_state.messages)
 
         # Determine if the chat input should be enabled based on the availability of credentials
-        is_input_enabled = st.session_state.email and st.session_state.password
+        is_input_enabled = email and password
 
         # Sidebar for creating a new conversation
         if st.sidebar.button("Create a new conversation", disabled=not is_input_enabled):
@@ -240,8 +245,7 @@ def main():
         st.session_state.messages[st.session_state.current_conversation].append(
             message)
 
-    if len(st.session_state.messages[st.session_state.current_conversation]) > 1:
-        save_conversations(st.session_state.messages,
+        save_conversations(st.session_state.messages, email
                            )
 
 
