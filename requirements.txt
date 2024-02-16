@@ -1,5 +1,5 @@
 streamlit==1.30.0
-hugchat==0.3.10
+hugchat==0.3.12
 langchain==0.1.1
 python-dotenv==1.0.0
 langchain-community==0.0.14
