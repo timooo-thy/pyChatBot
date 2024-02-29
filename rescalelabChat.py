@@ -177,8 +177,8 @@ def main():
             st.session_state.messages[f"Conversation {st.session_state.conversation_count + 1}"] = [
                 {"role": "AI", "content": "Hello, I am Joe from RescaleLab. How may I help you today?"}]
             st.session_state.conversation_count += 1
-            st.session_state.current_conversation = f"Conversation {
-                st.session_state.conversation_count}"
+            st.session_state.current_conversation = f"""Conversation {
+                st.session_state.conversation_count}"""
 
         # Download chat history button
         chat_history_json = json.dumps(st.session_state.messages, indent=4)
