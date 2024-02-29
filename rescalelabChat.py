@@ -42,47 +42,23 @@ def sign_in(email, password):
     return Login(email, password)
 
 
-def add_custom_css():
-    """Function for adding custom CSS"""
-    st.markdown("""
-    <style>
-    .wrapper {
-        word-wrap: break-word;
-    }
-    </style>
-    """, unsafe_allow_html=True)
-#
-
-
-def generate_response(conversation, prompt_input, cookies, value, context=None,):
+def generate_response(conversation, prompt_input, cookies, value, context=None):
     """Function for generating LLM response"""
-    add_custom_css()
     chatbot = hugchat.ChatBot(cookies=cookies.get_dict())
     chatbot.switch_llm(1)
-    # Create a placeholder
-    placeholder = st.empty()
-
-    # Initialize an empty string to collect responses
-    collected_responses = ''
-
+    print(conversation[-value:])
     # Create a prompt chaining the conversation and the new message from the user
     prompt = (f"This is a fun conversation between an Joe(AI) and a human. Your role is to engage users with informative, very entertaining responses about Rescale Lab in a human-like tone."
               "Focus on providing accurate and relevant information about the company's services and initiatives."
               "If a query falls outside Rescale Lab's scope, politely steer the conversation back to topics directly related to Rescale Lab."
               "Use the existing knowledge base and infer as needed to maintain a helpful and relevant dialogue, ensuring each interaction is aligned with Rescale Lab's themes and values."
               "Keep responses short and concise, and avoid using technical jargon. Follow best practices from the knowledge base strictly."
-              f"Knowledge base={context} The last {value} conversation is {conversation[:value]}." + f"The new message from human: {prompt_input}. AI:")
+              f"Knowledge base={context} The last {value} conversations is {conversation[-value:]}." + f"The new message from human: {prompt_input}. AI:")
 
     # Enable streaming responses from the chatbot
     for resp in chatbot.query(prompt, stream=True):
-        # Append the token to the collected_responses string
         if type(resp) == dict:
-            collected_responses += resp['token']
-            # Update the placeholder with the new string, applying the wrapper class
-            placeholder.markdown(
-                f"<div class='wrapper'>{collected_responses}</div>", unsafe_allow_html=True)
-
-    return collected_responses
+            yield resp['token']
 
 
 def get_cookies(sign):
@@ -235,19 +211,19 @@ def main():
             st.write(prompt)
 
     # Generate a new response if last message is not from AI
-    if st.session_state.messages[st.session_state.current_conversation][-1]["role"] != "AI":
+    if (st.session_state.messages[st.session_state.current_conversation][-1]["role"] != "AI"):
         with st.chat_message("AI"):
             cookies = get_cookies(credentials)
             with st.spinner("Generating response..."):
                 similar_context = retrieve_context(db, prompt)
-                response = generate_response(
-                    st.session_state.messages[st.session_state.current_conversation], prompt, cookies, value, similar_context)
+                response = st.write_stream(generate_response(
+                    st.session_state.messages[st.session_state.current_conversation], prompt, cookies, value, similar_context))
         message = {"role": "AI", "content": response}
         st.session_state.messages[st.session_state.current_conversation].append(
             message)
+        st.session_state['is_generating_response'] = False
 
-        save_conversations(st.session_state.messages, email
-                           )
+    save_conversations(st.session_state.messages, email)
 
 
 if __name__ == "__main__":
